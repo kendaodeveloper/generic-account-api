@@ -6,7 +6,16 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf, encoding) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      console.error("Invalid JSON received");
+      throw e;
+    }
+  }
+}));
 
 // Middleware to check auth
 function authMiddleware(req, res, next) {
@@ -134,5 +143,5 @@ app.get("/lunarbits/ranking", async (req, res) => {
 });
 
 app.listen(process.env.PORT || 3000, () => {
-  console.log(`API is running on port ${process.env.PORT || 3000}!!!`);
+  console.log(`API is running on port ${process.env.PORT || 3000}!`);
 });
