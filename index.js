@@ -3,7 +3,9 @@ import dotenv from "dotenv";
 import pool from "./db.js";
 
 dotenv.config();
+
 const app = express();
+
 app.use(express.json());
 
 // Middleware to check auth
@@ -24,14 +26,14 @@ function authMiddleware(req, res, next) {
 app.use(authMiddleware);
 
 /**
- * PUT /account
+ * PUT /accounts
  * Creates or updates a record based on (application + id_device).
  * Only updates the fields provided in the request body.
  */
-app.put("/lunarbits/account", async (req, res) => {
+app.put("/lunarbits/accounts", async (req, res) => {
   const { application, id_device, ...fields } = req.body;
 
-  if (!application && !id_device) {
+  if (!application || !id_device) {
     return res.status(400).json({ error: "application and id_device are required" });
   }
 
@@ -39,7 +41,7 @@ app.put("/lunarbits/account", async (req, res) => {
     // Build dynamic SQL for columns provided in request
     const columns = Object.keys(fields);
     if (columns.length === 0) {
-      return res.status(400).json({ error: "At least one field to update must be provided" });
+      return res.status(400).json({ error: "At least one field must be provided" });
     }
 
     const insertCols = ["application", "id_device", ...columns, "updated_at"];
@@ -62,16 +64,16 @@ app.put("/lunarbits/account", async (req, res) => {
     const result = await pool.query(query, insertVals);
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error in PUT /lunarbits/account", err);
+    console.error("Error in PUT /lunarbits/accounts", err);
     res.status(500).json({ error: "Error inserting/updating record: " + err.message });
   }
 });
 
 /**
- * GET /account
+ * GET /accounts
  * Fetches by application + id_device.
  */
-app.get("/lunarbits/account", async (req, res) => {
+app.get("/lunarbits/accounts", async (req, res) => {
   const { application, id_device } = req.query;
 
   if (!application || !id_device) {
@@ -93,7 +95,7 @@ app.get("/lunarbits/account", async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error in GET /lunarbits/account", err);
+    console.error("Error in GET /lunarbits/accounts", err);
     res.status(500).json({ error: "Error fetching record: " + err.message });
   }
 });
@@ -103,18 +105,21 @@ app.get("/lunarbits/account", async (req, res) => {
  * Returns top 10 by points (desc) filtered by application.
  */
 app.get("/lunarbits/ranking", async (req, res) => {
-  const { application } = req.query;
+  const { application, orderBy } = req.query;
 
   if (!application) {
     return res.status(400).json({ error: "application is required" });
   }
 
+  const validOrderBys = ["points", "level"];
+  const orderColumn = validOrderBys.includes(orderBy) ? orderBy : "points";
+
   try {
     const query = `
-      SELECT id, application, username, points
+      SELECT id, application, username, points, level, current_exp, next_level_exp
       FROM public.generic_account
       WHERE application = $1
-      ORDER BY points DESC
+      ORDER BY ${orderColumn} DESC
       LIMIT 10;
     `;
     const result = await pool.query(query, [application]);
