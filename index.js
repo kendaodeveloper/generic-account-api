@@ -6,7 +6,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ type: '*/*' }));
 
 // Middleware to check auth
 function authMiddleware(req, res, next) {
