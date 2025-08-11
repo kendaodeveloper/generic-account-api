@@ -73,11 +73,11 @@ app.put("/lunarbits/accounts", async (req, res) => {
  * GET /accounts
  * Fetches by application + id_device.
  */
-app.get("/lunarbits/accounts/:application/:id_device", async (req, res) => {
-  const { application, id_device } = req.params;
+app.get("/lunarbits/accounts", async (req, res) => {
+  const { application, id_device } = req.query;
 
   if (!application || !id_device) {
-    return res.status(400).json({ error: "application and id_device are required in url" });
+    return res.status(400).json({ error: "application and id_device are required in query params" });
   }
 
   try {
@@ -92,7 +92,7 @@ app.get("/lunarbits/accounts/:application/:id_device", async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error in GET /lunarbits/accounts/:application/:id_device", err);
+    console.error("Error in GET /lunarbits/accounts", err);
     res.status(500).json({ error: "Error fetching record: " + err.message });
   }
 });
