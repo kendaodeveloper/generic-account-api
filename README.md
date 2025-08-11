@@ -51,11 +51,14 @@ Request Body:
 
 {
   "application": "my_game",
-  "id_device": "device123",
-  "username": "player1",
+  "id_device": "device12345",
+  "username": "kendao",
   "points": 100,
   "coins": 50,
-  "gems": 10
+  "gems": 0,
+  "level": 1,
+  "current_exp": 0,
+  "next_level_exp": 100
 }
 ```
 
@@ -69,10 +72,10 @@ GET /lunarbits/account?application=my_game&id_device=device123
 
 ### GET ranking
 
-Returns top 10 accounts ordered by points (desc) filtered by application.
+Returns top 10 accounts ordered by points or level (desc) filtered by application.
 
 ```
-GET /lunarbits/ranking?application=my_game
+GET /lunarbits/ranking?application=my_game&orderBy=level
 ```
 
 ## Tech Stack
