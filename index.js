@@ -6,16 +6,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json({
-  verify: (req, res, buf, encoding) => {
-    try {
-      JSON.parse(buf);
-    } catch (e) {
-      console.error("Invalid JSON received");
-      throw e;
-    }
-  }
-}));
+app.use(express.json());
 
 // Middleware to check auth
 function authMiddleware(req, res, next) {
@@ -40,13 +31,10 @@ app.use(authMiddleware);
  * Only updates the fields provided in the request body.
  */
 app.put("/lunarbits/accounts", async (req, res) => {
-  console.log("Headers Recebidos:", JSON.stringify(req.headers, null, 2));
-  console.log("Body Recebido:", JSON.stringify(req.body, null, 2));
-
   const { application, id_device, ...fields } = req.body;
 
   if (!application || !id_device) {
-    return res.status(400).json({ error: "application and id_device are required" });
+    return res.status(400).json({ error: "application and id_device are required: " + JSON.stringify(req.body, null, 2) });
   }
 
   try {
