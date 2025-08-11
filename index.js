@@ -34,7 +34,7 @@ app.put("/lunarbits/accounts", async (req, res) => {
   const { application, id_device, ...fields } = req.body;
 
   if (!application || !id_device) {
-    return res.status(400).json({ error: "application and id_device are required: " + JSON.stringify(req.body, null, 2) });
+    return res.status(400).json({ error: "application and id_device are required in request body" });
   }
 
   try {
@@ -73,19 +73,16 @@ app.put("/lunarbits/accounts", async (req, res) => {
  * GET /accounts
  * Fetches by application + id_device.
  */
-app.get("/lunarbits/accounts", async (req, res) => {
-  const { application, id_device } = req.query;
+app.get("/lunarbits/accounts/:application/:id_device", async (req, res) => {
+  const { application, id_device } = req.params;
 
   if (!application || !id_device) {
-    return res.status(400).json({ error: "application and id_device are required" });
+    return res.status(400).json({ error: "application and id_device are required in url" });
   }
 
   try {
-    let query = "";
-    let values = [];
-
-    query = `SELECT * FROM public.generic_account WHERE application = $1 AND id_device = $2`;
-    values = [application, id_device];
+    const query = `SELECT * FROM public.generic_account WHERE application = $1 AND id_device = $2`;
+    const values = [application, id_device];
 
     const result = await pool.query(query, values);
 
@@ -95,7 +92,7 @@ app.get("/lunarbits/accounts", async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error in GET /lunarbits/accounts", err);
+    console.error("Error in GET /lunarbits/accounts/:application/:id_device", err);
     res.status(500).json({ error: "Error fetching record: " + err.message });
   }
 });
