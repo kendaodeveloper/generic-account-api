@@ -31,7 +31,7 @@ app.use(authMiddleware);
 app.put("/lunarbits/account", async (req, res) => {
   const { application, id_device, ...fields } = req.body;
 
-  if (!application || !id_device) {
+  if (!application && !id_device) {
     return res.status(400).json({ error: "application and id_device are required" });
   }
 
@@ -62,7 +62,7 @@ app.put("/lunarbits/account", async (req, res) => {
     const result = await pool.query(query, insertVals);
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error in PUT /account", err);
+    console.error("Error in PUT /lunarbits/account", err);
     res.status(500).json({ error: "Error inserting/updating record: " + err.message });
   }
 });
@@ -93,7 +93,7 @@ app.get("/lunarbits/account", async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error in GET /account", err);
+    console.error("Error in GET /lunarbits/account", err);
     res.status(500).json({ error: "Error fetching record: " + err.message });
   }
 });
@@ -120,7 +120,7 @@ app.get("/lunarbits/ranking", async (req, res) => {
     const result = await pool.query(query, [application]);
     res.json(result.rows);
   } catch (err) {
-    console.error("Error in GET /ranking", err);
+    console.error("Error in GET /lunarbits/ranking", err);
     res.status(500).json({ error: "Error fetching ranking: " + err.message });
   }
 });
