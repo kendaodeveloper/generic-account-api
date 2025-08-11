@@ -134,5 +134,5 @@ app.get("/lunarbits/ranking", async (req, res) => {
 });
 
 app.listen(process.env.PORT || 3000, () => {
-  console.log(`API is running on port ${process.env.PORT || 3000}!`);
+  console.log(`API is running on port ${process.env.PORT || 3000}!!!`);
 });
