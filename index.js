@@ -30,11 +30,11 @@ function authMiddleware(req, res, next) {
 app.use(authMiddleware);
 
 // check application health
-app.get("/healthcheck", async (req, res) => {
+app.get("/lunarbits/healthcheck", async (req, res) => {
   const health = {
     status: "up",
-    timestamp: new Date().toISOString(),
-    database: "unknown"
+    database: "unknown",
+    timestamp: new Date().toISOString()
   };
 
   try {
