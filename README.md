@@ -58,7 +58,8 @@ Request Body:
   "gems": 0,
   "level": 1,
   "current_exp": 0,
-  "next_level_exp": 100
+  "next_level_exp": 100,
+  "base_exp": 100
 }
 ```
 

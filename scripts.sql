@@ -11,6 +11,7 @@ CREATE TABLE public.generic_account (
     level INT DEFAULT 1 NOT NULL,
     current_exp INT DEFAULT 0 NOT NULL,
     next_level_exp INT DEFAULT 100 NOT NULL,
+    base_exp INT DEFAULT 100 NOT NULL,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP,
     CONSTRAINT unique_application_and_username UNIQUE (application, username),

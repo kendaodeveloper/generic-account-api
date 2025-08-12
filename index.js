@@ -10,6 +10,10 @@ app.use(express.json());
 
 // Middleware to check auth
 function authMiddleware(req, res, next) {
+  if (!process.env.AUTH_TOKEN) {
+    return next();
+  }
+
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
     return res.status(401).json({ error: "Authorization header missing" });
@@ -24,6 +28,25 @@ function authMiddleware(req, res, next) {
 }
 
 app.use(authMiddleware);
+
+// check application health
+app.get("/healthcheck", async (req, res) => {
+  const health = {
+    status: "up",
+    timestamp: new Date().toISOString(),
+    database: "unknown"
+  };
+
+  try {
+    await pool.query("SELECT 1");
+    health.database = "up";
+  } catch (err) {
+    health.database = "down";
+    console.error("Database healthcheck failed:", err.message);
+  }
+
+  res.status(health.database === "up" ? 200 : 500).json(health);
+});
 
 /**
  * PUT /accounts
@@ -113,7 +136,7 @@ app.get("/lunarbits/ranking", async (req, res) => {
 
   try {
     const query = `
-      SELECT id, application, username, points, level, current_exp, next_level_exp
+      SELECT id, application, username, points, level, current_exp, next_level_exp, base_exp
       FROM public.generic_account
       WHERE application = $1
       ORDER BY ${orderColumn} DESC
