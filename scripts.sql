@@ -10,7 +10,7 @@ CREATE TABLE public.generic_account (
     gems INT DEFAULT 0 NOT NULL,
     level INT DEFAULT 1 NOT NULL,
     current_exp INT DEFAULT 0 NOT NULL,
-    next_level_exp INT DEFAULT 100 NOT NULL,
+    next_level_exp INT DEFAULT 100 NOT NULL, -- nextLevelExp = baseExp * (level ^ factor)
     base_exp INT DEFAULT 100 NOT NULL,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP,
