@@ -29,7 +29,6 @@ function authMiddleware(req, res, next) {
 
 app.use(authMiddleware);
 
-// check application health
 app.get("/lunarbits/healthcheck", async (req, res) => {
   const health = {
     status: "up",
@@ -113,7 +112,13 @@ app.get("/lunarbits/accounts", async (req, res) => {
       return res.status(404).json({ error: "Record not found" });
     }
 
-    res.json(result.rows[0]);
+    const account = result.rows[0];
+    account.is_premium = !!(
+      account.premium_date &&
+      new Date(account.premium_date) > new Date()
+    );
+
+    res.json(account);
   } catch (err) {
     console.error("Error in GET /lunarbits/accounts", err);
     res.status(500).json({ error: "Error fetching record: " + err.message });
@@ -136,14 +141,21 @@ app.get("/lunarbits/ranking", async (req, res) => {
 
   try {
     const query = `
-      SELECT id, game, username, wins, losses, draws, points, level
+      SELECT id, game, username, wins, losses, draws, points, level, premium_date
       FROM public.generic_account
       WHERE game = $1
       ORDER BY ${orderColumn} DESC
       LIMIT 10;
     `;
     const result = await pool.query(query, [game]);
-    res.json(result.rows);
+
+    const now = new Date();
+    const accounts = result.rows.map(acc => ({
+      ...acc,
+      is_premium: !!(acc.premium_date && new Date(acc.premium_date) > now)
+    }));
+
+    res.json(accounts);
   } catch (err) {
     console.error("Error in GET /lunarbits/ranking", err);
     res.status(500).json({ error: "Error fetching ranking: " + err.message });

@@ -15,6 +15,7 @@ CREATE TABLE public.generic_account (
     current_exp INT DEFAULT 0 NOT NULL,
     maximum_exp INT DEFAULT 100 NOT NULL, -- nextLevelExp = baseExp * (level ^ factor)
     base_exp INT DEFAULT 100 NOT NULL,
+    premium_date TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP,
     CONSTRAINT unique_game_and_username UNIQUE (game, username),

@@ -70,7 +70,8 @@ Request Body:
   "level": 1,
   "current_exp": 0,
   "maximum_exp": 100,
-  "base_exp": 100
+  "base_exp": 100,
+  "premium_date": null
 }
 ```
 
