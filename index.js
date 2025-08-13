@@ -84,7 +84,14 @@ app.put("/lunarbits/accounts", async (req, res) => {
     `;
 
     const result = await pool.query(query, insertVals);
-    res.json(result.rows[0]);
+
+    const account = result.rows[0];
+    account.is_premium = !!(
+      account.premium_date &&
+      new Date(account.premium_date) > new Date()
+    );
+
+    res.json(account);
   } catch (err) {
     console.error("Error in PUT /lunarbits/accounts", err);
     res.status(500).json({ error: "Error inserting/updating record: " + err.message });
