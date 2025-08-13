@@ -38,7 +38,7 @@ npm run start
 
 Add an Authorization header to requests based on the AUTH_TOKEN env variable.
 
-### GET account
+### GET healthcheck
 
 Check application health.
 
