@@ -50,14 +50,14 @@ app.get("/lunarbits/healthcheck", async (req, res) => {
 
 /**
  * PUT /accounts
- * Creates or updates a record based on (application + id_device).
+ * Creates or updates a record based on (game + id_device).
  * Only updates the fields provided in the request body.
  */
 app.put("/lunarbits/accounts", async (req, res) => {
-  const { application, id_device, ...fields } = req.body;
+  const { game, id_device, ...fields } = req.body;
 
-  if (!application || !id_device) {
-    return res.status(400).json({ error: "application and id_device are required in request body" });
+  if (!game || !id_device) {
+    return res.status(400).json({ error: "game and id_device are required in request body" });
   }
 
   try {
@@ -67,8 +67,8 @@ app.put("/lunarbits/accounts", async (req, res) => {
       return res.status(400).json({ error: "At least one field must be provided" });
     }
 
-    const insertCols = ["application", "id_device", ...columns, "updated_at"];
-    const insertVals = [application, id_device, ...columns.map(c => fields[c]), new Date()];
+    const insertCols = ["game", "id_device", ...columns, "updated_at"];
+    const insertVals = [game, id_device, ...columns.map(c => fields[c]), new Date()];
 
     const insertPlaceholders = insertVals.map((_, i) => `$${i + 1}`).join(", ");
 
@@ -79,7 +79,7 @@ app.put("/lunarbits/accounts", async (req, res) => {
     const query = `
       INSERT INTO public.generic_account (${insertCols.join(", ")})
       VALUES (${insertPlaceholders})
-      ON CONFLICT (application, id_device)
+      ON CONFLICT (game, id_device)
       DO UPDATE SET ${updateSet}
       RETURNING *;
     `;
@@ -94,18 +94,18 @@ app.put("/lunarbits/accounts", async (req, res) => {
 
 /**
  * GET /accounts
- * Fetches by application + id_device.
+ * Fetches by game + id_device.
  */
 app.get("/lunarbits/accounts", async (req, res) => {
-  const { application, id_device } = req.query;
+  const { game, id_device } = req.query;
 
-  if (!application || !id_device) {
-    return res.status(400).json({ error: "application and id_device are required in query params" });
+  if (!game || !id_device) {
+    return res.status(400).json({ error: "game and id_device are required in query params" });
   }
 
   try {
-    const query = `SELECT * FROM public.generic_account WHERE application = $1 AND id_device = $2`;
-    const values = [application, id_device];
+    const query = `SELECT * FROM public.generic_account WHERE game = $1 AND id_device = $2`;
+    const values = [game, id_device];
 
     const result = await pool.query(query, values);
 
@@ -122,27 +122,27 @@ app.get("/lunarbits/accounts", async (req, res) => {
 
 /**
  * GET /ranking
- * Returns top 10 by points (desc) filtered by application.
+ * Returns top 10 by column (desc) filtered by game.
  */
 app.get("/lunarbits/ranking", async (req, res) => {
-  const { application, orderBy } = req.query;
+  const { game, orderBy } = req.query;
 
-  if (!application) {
-    return res.status(400).json({ error: "application is required" });
+  if (!game) {
+    return res.status(400).json({ error: "game is required" });
   }
 
-  const validOrderBys = ["points", "level"];
+  const validOrderBys = ["wins", "points", "level"];
   const orderColumn = validOrderBys.includes(orderBy) ? orderBy : "points";
 
   try {
     const query = `
-      SELECT id, application, username, points, level, current_exp, next_level_exp, base_exp
+      SELECT id, game, username, wins, losses, draws, points, level
       FROM public.generic_account
-      WHERE application = $1
+      WHERE game = $1
       ORDER BY ${orderColumn} DESC
       LIMIT 10;
     `;
-    const result = await pool.query(query, [application]);
+    const result = await pool.query(query, [game]);
     res.json(result.rows);
   } catch (err) {
     console.error("Error in GET /lunarbits/ranking", err);

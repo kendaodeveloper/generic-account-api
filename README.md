@@ -38,9 +38,17 @@ npm run start
 
 Add an Authorization header to requests based on the AUTH_TOKEN env variable.
 
+### GET account
+
+Check application health.
+
+```
+GET /lunarbits/healthcheck
+```
+
 ### PUT account
 
-Creates or updates a record based on (application + id_device).
+Creates or updates a record based on (game + id_device).
 
 Only updates the fields provided in the request body.
 
@@ -50,33 +58,36 @@ PUT /lunarbits/account
 Request Body:
 
 {
-  "application": "my_game",
+  "game": "my_game",
   "id_device": "device12345",
   "username": "kendao",
+  "wins": 0,
+  "losses": 0,
+  "draws": 0,
   "points": 100,
   "coins": 50,
   "gems": 0,
   "level": 1,
   "current_exp": 0,
-  "next_level_exp": 100,
+  "maximum_exp": 100,
   "base_exp": 100
 }
 ```
 
 ### GET account
 
-Fetches by application + id_device.
+Fetches by game + id_device.
 
 ```
-GET /lunarbits/account?application=my_game&id_device=device123
+GET /lunarbits/account?game=my_game&id_device=device123
 ```
 
 ### GET ranking
 
-Returns top 10 accounts ordered by points or level (desc) filtered by application.
+Returns top 10 accounts ordered by points/level/wins (desc) filtered by game.
 
 ```
-GET /lunarbits/ranking?application=my_game&orderBy=level
+GET /lunarbits/ranking?game=my_game&orderBy=level
 ```
 
 ## Tech Stack
